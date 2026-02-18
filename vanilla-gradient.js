@@ -26,9 +26,10 @@
   function extractAndApplyColors(imageURL) {
     // Use a small TMDB size for faster color extraction
     var sampleURL = imageURL;
-    // If it's a TMDB w1280 URL, swap to w342 for faster Vibrant sampling
+    // Use w185 for Vibrant sampling (w342 is used by thumbnails — same URL
+    // would hit the browser cache without CORS headers, tainting the canvas)
     if (imageURL.indexOf(TMDB_IMG + 'w1280') === 0) {
-      sampleURL = imageURL.replace(TMDB_IMG + 'w1280', TMDB_IMG + 'w342');
+      sampleURL = imageURL.replace(TMDB_IMG + 'w1280', TMDB_IMG + 'w185');
     }
 
     Vibrant.from(sampleURL)
@@ -39,28 +40,40 @@
       .catch(function () {
         // Fallback: dark gradient if Vibrant fails
         colorLayer.style.background =
-          'linear-gradient(180deg, #1a1a2e 0%, #000 100%)';
+          'linear-gradient(60.64deg, #000 0%, #1a1a2e 100%)';
       });
   }
 
+  function luminance(rgb) {
+    return rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114;
+  }
+
+  function toRgbStr(rgb) {
+    return 'rgb(' + Math.round(rgb[0]) + ',' + Math.round(rgb[1]) + ',' + Math.round(rgb[2]) + ')';
+  }
+
   function applyColorGradient(palette) {
-    // Pick dominant color (prefer DarkVibrant, fallback chain)
-    var primary = palette.DarkVibrant || palette.Vibrant || palette.Muted;
-    var secondary = palette.DarkMuted || palette.Muted || palette.DarkVibrant;
-    var accent = palette.Vibrant || palette.LightVibrant || palette.LightMuted;
+    // Collect all available swatches, sort by brightness
+    var names = ['Vibrant', 'DarkVibrant', 'LightVibrant', 'Muted', 'DarkMuted', 'LightMuted'];
+    var swatches = [];
+    names.forEach(function (n) {
+      if (palette[n]) swatches.push(palette[n].getRgb());
+    });
 
-    // Default fallbacks
-    var primaryRgb = primary ? primary.getRgb() : [20, 20, 40];
-    var secondaryRgb = secondary ? secondary.getRgb() : [0, 0, 0];
-    var accentRgb = accent ? accent.getRgb() : [40, 40, 60];
+    if (swatches.length === 0) {
+      colorLayer.style.background = 'linear-gradient(60.64deg, #000 0%, #1a1a2e 100%)';
+      return;
+    }
 
-    var c1 = 'rgb(' + Math.round(primaryRgb[0]) + ',' + Math.round(primaryRgb[1]) + ',' + Math.round(primaryRgb[2]) + ')';
-    var c2 = 'rgb(' + Math.round(secondaryRgb[0]) + ',' + Math.round(secondaryRgb[1]) + ',' + Math.round(secondaryRgb[2]) + ')';
-    var c3 = 'rgb(' + Math.round(accentRgb[0]) + ',' + Math.round(accentRgb[1]) + ',' + Math.round(accentRgb[2]) + ')';
+    swatches.sort(function (a, b) { return luminance(a) - luminance(b); });
 
-    // 60.64° diagonal: secondary (dark, bottom-left) → primary (rich, center) → accent (bright, top-right)
+    // Darkest, middle, lightest — maximum contrast
+    var dark = swatches[0];
+    var mid = swatches[Math.floor(swatches.length / 2)];
+    var light = swatches[swatches.length - 1];
+
     colorLayer.style.background =
-      'linear-gradient(60.64deg, ' + c2 + ' 0%, ' + c1 + ' 50%, ' + c3 + ' 100%)';
+      'linear-gradient(60.64deg, ' + toRgbStr(dark) + ' 0%, ' + toRgbStr(mid) + ' 50%, ' + toRgbStr(light) + ' 100%)';
   }
 
   // ========== TMDB SEARCH ==========
