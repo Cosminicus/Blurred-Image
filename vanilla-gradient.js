@@ -58,9 +58,9 @@
     var c2 = 'rgb(' + Math.round(secondaryRgb[0]) + ',' + Math.round(secondaryRgb[1]) + ',' + Math.round(secondaryRgb[2]) + ')';
     var c3 = 'rgb(' + Math.round(accentRgb[0]) + ',' + Math.round(accentRgb[1]) + ',' + Math.round(accentRgb[2]) + ')';
 
-    // 60.64° diagonal: secondary (dark, bottom-left) → primary (rich, center) → accent (bright, top-right)
+    // Diagonal gradient: accent → primary → secondary
     colorLayer.style.background =
-      'linear-gradient(60.64deg, ' + c2 + ' 0%, ' + c1 + ' 50%, ' + c3 + ' 100%)';
+      'linear-gradient(60.64deg, ' + c3 + ' 0%, ' + c1 + ' 50%, ' + c2 + ' 100%)';
   }
 
   // ========== TMDB SEARCH ==========
@@ -86,8 +86,8 @@
   function renderResults(movies) {
     searchResults.innerHTML = '';
 
-    var withBackdrops = movies.filter(function (m) { return m.backdrop_path; });
-    var top = withBackdrops.slice(0, 10);
+    var withPosters = movies.filter(function (m) { return m.backdrop_path; });
+    var top = withPosters.slice(0, 6);
 
     if (top.length === 0) {
       searchResults.innerHTML = '<p style="color:#666;font-size:12px;">No results found.</p>';
@@ -99,7 +99,7 @@
       card.className = 'result-card';
 
       var img = document.createElement('img');
-      img.src = TMDB_IMG + 'w342' + movie.backdrop_path;
+      img.src = TMDB_IMG + 'w342' + movie.poster_path;
       img.alt = movie.title;
       img.loading = 'lazy';
 
