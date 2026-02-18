@@ -1,0 +1,344 @@
+/* ========== RESET & BASE ========== */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 960px;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #111;
+  overflow-x: hidden;
+  color: #fff;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ========== RESULT SECTION (960×540 landscape) ========== */
+.result-section {
+  position: relative;
+  width: 960px;
+  height: 540px;
+  background: #1b1c21;
+  overflow: hidden;
+}
+
+/* Layer 2: 2-color diagonal gradient (72deg) from Vibrant.js */
+.color-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: #1b1c21;
+  transition: background 0.6s ease;
+}
+
+/* Layer 3: 1-color vertical gradient at 50% opacity */
+.color-wash {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0.5;
+  transition: background 0.6s ease;
+}
+
+/* Layer 4: Dimmer overlay — 20% opacity per Figma spec */
+.dimmer-layer {
+  position: absolute;
+  inset: 0;
+  background: #141414;
+  opacity: 0.2;
+  z-index: 3;
+}
+
+/* Layer 5: Cover image — 640×360, right-aligned, 32px from top */
+.sharp-image {
+  position: absolute;
+  z-index: 4;
+  top: 32px;
+  right: 0;
+  width: 640px;
+  height: 360px;
+  object-fit: cover;
+  display: none;
+
+  /* 3 composed masks from Figma (16-stop easing curves) — identical to vanilla-gradient */
+  -webkit-mask-image:
+    linear-gradient(270deg,
+      #FFF 50%,
+      rgba(255,255,255,0.99) 53.33%,
+      rgba(255,255,255,0.96) 56.67%,
+      rgba(255,255,255,0.92) 60%,
+      rgba(255,255,255,0.85) 63.33%,
+      rgba(255,255,255,0.77) 66.67%,
+      rgba(255,255,255,0.67) 70%,
+      rgba(255,255,255,0.56) 73.33%,
+      rgba(255,255,255,0.44) 76.67%,
+      rgba(255,255,255,0.33) 80%,
+      rgba(255,255,255,0.23) 83.34%,
+      rgba(255,255,255,0.15) 86.67%,
+      rgba(255,255,255,0.08) 90%,
+      rgba(255,255,255,0.04) 93.34%,
+      rgba(255,255,255,0.01) 96.67%,
+      rgba(255,255,255,0.00) 100%),
+    linear-gradient(0deg,
+      #FFF 84.69%,
+      rgba(255,255,255,0.99) 85.71%,
+      rgba(255,255,255,0.96) 86.73%,
+      rgba(255,255,255,0.92) 87.75%,
+      rgba(255,255,255,0.85) 88.77%,
+      rgba(255,255,255,0.77) 89.79%,
+      rgba(255,255,255,0.67) 90.81%,
+      rgba(255,255,255,0.56) 91.84%,
+      rgba(255,255,255,0.44) 92.86%,
+      rgba(255,255,255,0.33) 93.88%,
+      rgba(255,255,255,0.23) 94.9%,
+      rgba(255,255,255,0.15) 95.92%,
+      rgba(255,255,255,0.08) 96.94%,
+      rgba(255,255,255,0.04) 97.96%,
+      rgba(255,255,255,0.01) 98.98%,
+      rgba(255,255,255,0.00) 100%),
+    linear-gradient(180deg,
+      #FFF 73.89%,
+      rgba(255,255,255,0.99) 75.63%,
+      rgba(255,255,255,0.96) 77.37%,
+      rgba(255,255,255,0.92) 79.11%,
+      rgba(255,255,255,0.85) 80.85%,
+      rgba(255,255,255,0.77) 82.59%,
+      rgba(255,255,255,0.67) 84.33%,
+      rgba(255,255,255,0.56) 86.07%,
+      rgba(255,255,255,0.44) 87.81%,
+      rgba(255,255,255,0.33) 89.56%,
+      rgba(255,255,255,0.23) 91.3%,
+      rgba(255,255,255,0.15) 93.04%,
+      rgba(255,255,255,0.08) 94.78%,
+      rgba(255,255,255,0.04) 96.52%,
+      rgba(255,255,255,0.01) 98.26%,
+      rgba(255,255,255,0.00) 100%);
+  -webkit-mask-composite: source-in, source-in;
+
+  mask-image:
+    linear-gradient(270deg,
+      #FFF 50%,
+      rgba(255,255,255,0.99) 53.33%,
+      rgba(255,255,255,0.96) 56.67%,
+      rgba(255,255,255,0.92) 60%,
+      rgba(255,255,255,0.85) 63.33%,
+      rgba(255,255,255,0.77) 66.67%,
+      rgba(255,255,255,0.67) 70%,
+      rgba(255,255,255,0.56) 73.33%,
+      rgba(255,255,255,0.44) 76.67%,
+      rgba(255,255,255,0.33) 80%,
+      rgba(255,255,255,0.23) 83.34%,
+      rgba(255,255,255,0.15) 86.67%,
+      rgba(255,255,255,0.08) 90%,
+      rgba(255,255,255,0.04) 93.34%,
+      rgba(255,255,255,0.01) 96.67%,
+      rgba(255,255,255,0.00) 100%),
+    linear-gradient(0deg,
+      #FFF 84.69%,
+      rgba(255,255,255,0.99) 85.71%,
+      rgba(255,255,255,0.96) 86.73%,
+      rgba(255,255,255,0.92) 87.75%,
+      rgba(255,255,255,0.85) 88.77%,
+      rgba(255,255,255,0.77) 89.79%,
+      rgba(255,255,255,0.67) 90.81%,
+      rgba(255,255,255,0.56) 91.84%,
+      rgba(255,255,255,0.44) 92.86%,
+      rgba(255,255,255,0.33) 93.88%,
+      rgba(255,255,255,0.23) 94.9%,
+      rgba(255,255,255,0.15) 95.92%,
+      rgba(255,255,255,0.08) 96.94%,
+      rgba(255,255,255,0.04) 97.96%,
+      rgba(255,255,255,0.01) 98.98%,
+      rgba(255,255,255,0.00) 100%),
+    linear-gradient(180deg,
+      #FFF 73.89%,
+      rgba(255,255,255,0.99) 75.63%,
+      rgba(255,255,255,0.96) 77.37%,
+      rgba(255,255,255,0.92) 79.11%,
+      rgba(255,255,255,0.85) 80.85%,
+      rgba(255,255,255,0.77) 82.59%,
+      rgba(255,255,255,0.67) 84.33%,
+      rgba(255,255,255,0.56) 86.07%,
+      rgba(255,255,255,0.44) 87.81%,
+      rgba(255,255,255,0.33) 89.56%,
+      rgba(255,255,255,0.23) 91.3%,
+      rgba(255,255,255,0.15) 93.04%,
+      rgba(255,255,255,0.08) 94.78%,
+      rgba(255,255,255,0.04) 96.52%,
+      rgba(255,255,255,0.01) 98.26%,
+      rgba(255,255,255,0.00) 100%);
+  mask-composite: intersect, intersect;
+}
+
+.sharp-image.visible {
+  display: block;
+}
+
+/* Placeholder text before upload */
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 4;
+}
+
+.placeholder-text {
+  color: #555;
+  font-size: 16px;
+}
+
+.placeholder.hidden {
+  display: none !important;
+}
+
+/* ========== CONTROLS SECTION (below result) ========== */
+.controls-section {
+  width: 960px;
+  padding: 24px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  background: #111;
+}
+
+/* Search bar */
+.search-wrapper {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+}
+
+.search-input {
+  flex: 1;
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid #333;
+  border-radius: 12px;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: #555;
+}
+
+.search-input::placeholder {
+  color: #666;
+}
+
+.search-btn {
+  height: 48px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 12px;
+  background: #fff;
+  color: #000;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.search-btn:active {
+  opacity: 0.7;
+}
+
+/* Search results grid — 5 columns, 16:9 landscape cards */
+.search-results {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.search-results:empty {
+  display: none;
+}
+
+.result-card {
+  width: calc(20% - 7px);
+  aspect-ratio: 16/9;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.result-card:hover {
+  border-color: rgba(255,255,255,0.3);
+}
+
+.result-card:active {
+  border-color: #fff;
+}
+
+.result-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.result-card .card-title {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 4px 6px;
+  background: rgba(0,0,0,0.7);
+  font-size: 11px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Divider */
+.divider {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #555;
+  font-size: 12px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #333;
+}
+
+/* Upload button */
+.upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 48px;
+  border-radius: 12px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #aaa;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.upload-btn:active {
+  opacity: 0.7;
+}

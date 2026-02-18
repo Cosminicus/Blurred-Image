@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=960, initial-scale=1.0, user-scalable=no">
+  <title>Dual Gradient Background (2-Color + 1-Color with Opacity)</title>
+  <link rel="stylesheet" href="dual-gradient.css">
+</head>
+<body>
+  <!-- Result section: 960×540 layered composite (Figma Vanilla 2.5 spec) -->
+  <div id="result-section" class="result-section">
+    <!-- Layer 1: Background — dark base #1b1c21 via CSS -->
+    <!-- Layer 2: 2-color diagonal gradient (72deg) from Vibrant.js -->
+    <div id="color-layer" class="color-layer"></div>
+    <!-- Layer 3: 1-color vertical gradient at 50% opacity -->
+    <div id="color-wash" class="color-wash"></div>
+    <!-- Layer 4: Dimmer overlay — 20% opacity -->
+    <div class="dimmer-layer"></div>
+    <!-- Layer 5: Cover image 640×360, right-aligned with composed mask -->
+    <img id="sharp-image" class="sharp-image" alt="Movie backdrop">
+    <!-- Placeholder shown before any image -->
+    <div id="placeholder" class="placeholder">
+      <span class="placeholder-text">Search a movie or upload an image</span>
+    </div>
+  </div>
+
+  <!-- Controls section: below the result, never overlapping -->
+  <div class="controls-section">
+    <!-- TMDB search -->
+    <div class="search-wrapper">
+      <input type="text" id="search-input" class="search-input" placeholder="Search movie (e.g. Forrest Gump)">
+      <button id="search-btn" class="search-btn">Search</button>
+    </div>
+
+    <!-- Search results — 5-column landscape grid -->
+    <div id="search-results" class="search-results"></div>
+
+    <!-- Divider -->
+    <div class="divider"><span>or</span></div>
+
+    <!-- Manual upload -->
+    <label for="file-input" class="upload-btn">
+      <span>Upload Image</span>
+    </label>
+    <input type="file" id="file-input" accept="image/*" hidden>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"></script>
+  <script src="dual-gradient.js"></script>
+</body>
+</html>
