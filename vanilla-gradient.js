@@ -58,9 +58,9 @@
     var c2 = 'rgb(' + Math.round(secondaryRgb[0]) + ',' + Math.round(secondaryRgb[1]) + ',' + Math.round(secondaryRgb[2]) + ')';
     var c3 = 'rgb(' + Math.round(accentRgb[0]) + ',' + Math.round(accentRgb[1]) + ',' + Math.round(accentRgb[2]) + ')';
 
-    // Diagonal gradient: accent → primary → secondary
+    // Diagonal gradient: secondary (dark, bottom-left) → primary (center) → accent (bright, top-right)
     colorLayer.style.background =
-      'linear-gradient(60.64deg, ' + c3 + ' 0%, ' + c1 + ' 50%, ' + c2 + ' 100%)';
+      'linear-gradient(60.64deg, ' + c2 + ' 0%, ' + c1 + ' 50%, ' + c3 + ' 100%)';
   }
 
   // ========== TMDB SEARCH ==========
