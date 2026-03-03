@@ -1,0 +1,217 @@
+(function () {
+  'use strict';
+
+  // TMDB API config
+  var TMDB_API_KEY = '2dca580c2a14b55200e784d157207b4d';
+  var TMDB_BASE = 'https://api.themoviedb.org/3';
+  var TMDB_IMG = 'https://image.tmdb.org/t/p/';
+
+  // DOM references
+  var fileInput = document.getElementById('file-input');
+  var colorLayer = document.getElementById('color-layer');
+  var placeholder = document.getElementById('placeholder');
+  var searchInput = document.getElementById('search-input');
+  var searchBtn = document.getElementById('search-btn');
+  var searchResults = document.getElementById('search-results');
+  var bgToggle = document.getElementById('bg-toggle');
+
+  // Background toggle state
+  var bgMode = 'checkers';
+  var lastImageURL = null;
+
+  // Event listeners
+  fileInput.addEventListener('change', handleFileSelect);
+  searchBtn.addEventListener('click', handleSearch);
+  searchInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') handleSearch();
+  });
+  bgToggle.addEventListener('click', toggleBgMode);
+
+  // ========== DOM HELPERS ==========
+  function clearResults() {
+    while (searchResults.firstChild) {
+      searchResults.removeChild(searchResults.firstChild);
+    }
+  }
+
+  function showMessage(text) {
+    clearResults();
+    var p = document.createElement('p');
+    p.style.color = '#666';
+    p.style.fontSize = '12px';
+    p.textContent = text;
+    searchResults.appendChild(p);
+  }
+
+  // ========== VIBRANT COLOR EXTRACTION ==========
+  function extractAndApplyColors(imageURL) {
+    var sampleURL = imageURL;
+    // Use w185 for Vibrant sampling (w342 is used by thumbnails — same URL
+    // would hit the browser cache without CORS headers, tainting the canvas)
+    if (imageURL.indexOf(TMDB_IMG + 'w1280') === 0) {
+      sampleURL = imageURL.replace(TMDB_IMG + 'w1280', TMDB_IMG + 'w185');
+    }
+
+    Vibrant.from(sampleURL)
+      .getPalette()
+      .then(function (palette) {
+        applyColorGradient(palette);
+      })
+      .catch(function () {
+        // Fallback: dark gradient if Vibrant fails
+        colorLayer.style.background =
+          'linear-gradient(60.64deg, #000 0%, #1a1a2e 100%)';
+      });
+  }
+
+  function luminance(rgb) {
+    return rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114;
+  }
+
+  function toRgbStr(rgb) {
+    return 'rgb(' + Math.round(rgb[0]) + ',' + Math.round(rgb[1]) + ',' + Math.round(rgb[2]) + ')';
+  }
+
+  function applyColorGradient(palette) {
+    // Collect all available swatches, sort by brightness
+    var names = ['Vibrant', 'DarkVibrant', 'LightVibrant', 'Muted', 'DarkMuted', 'LightMuted'];
+    var swatches = [];
+    names.forEach(function (n) {
+      if (palette[n]) swatches.push(palette[n].getRgb());
+    });
+
+    if (swatches.length === 0) {
+      colorLayer.style.background = 'linear-gradient(60.64deg, #000 0%, #1a1a2e 100%)';
+      return;
+    }
+
+    swatches.sort(function (a, b) { return luminance(a) - luminance(b); });
+
+    // Darkest, middle, lightest — maximum contrast
+    var dark = swatches[0];
+    var mid = swatches[Math.floor(swatches.length / 2)];
+    var light = swatches[swatches.length - 1];
+
+    colorLayer.style.background =
+      'linear-gradient(60.64deg, ' + toRgbStr(dark) + ' 0%, ' + toRgbStr(mid) + ' 50%, ' + toRgbStr(light) + ' 100%)';
+  }
+
+  // ========== TMDB SEARCH ==========
+  function handleSearch() {
+    var query = searchInput.value.trim();
+    if (!query) return;
+
+    searchBtn.textContent = '...';
+    clearResults();
+
+    fetch(TMDB_BASE + '/search/movie?api_key=' + TMDB_API_KEY + '&query=' + encodeURIComponent(query))
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        searchBtn.textContent = 'Search';
+        renderResults(data.results || []);
+      })
+      .catch(function () {
+        searchBtn.textContent = 'Search';
+        showMessage('Search failed. Check connection.');
+      });
+  }
+
+  function renderResults(movies) {
+    clearResults();
+
+    var withBackdrops = movies.filter(function (m) { return m.backdrop_path; });
+    var top = withBackdrops.slice(0, 10);
+
+    if (top.length === 0) {
+      showMessage('No results found.');
+      return;
+    }
+
+    top.forEach(function (movie) {
+      var card = document.createElement('div');
+      card.className = 'result-card';
+
+      var img = document.createElement('img');
+      img.src = TMDB_IMG + 'w342' + movie.backdrop_path;
+      img.alt = movie.title;
+      img.loading = 'lazy';
+
+      var title = document.createElement('div');
+      title.className = 'card-title';
+      title.textContent = movie.title;
+
+      card.appendChild(img);
+      card.appendChild(title);
+      searchResults.appendChild(card);
+
+      card.addEventListener('click', function () {
+        var backdropURL = TMDB_IMG + 'w1280' + movie.backdrop_path;
+        applyLayers(backdropURL);
+      });
+    });
+  }
+
+  // ========== FILE UPLOAD ==========
+  function handleFileSelect(event) {
+    var file = event.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) return;
+
+    var objectURL = URL.createObjectURL(file);
+
+    var img = new Image();
+    img.onload = function () {
+      applyLayers(objectURL);
+    };
+    img.onerror = function () {
+      URL.revokeObjectURL(objectURL);
+    };
+    img.src = objectURL;
+  }
+
+  // ========== BACKGROUND TOGGLE ==========
+  function toggleBgMode() {
+    if (bgMode === 'checkers') {
+      bgMode = 'image';
+      bgToggle.textContent = 'BG: Image';
+      applyBgImage();
+    } else {
+      bgMode = 'checkers';
+      bgToggle.textContent = 'BG: Checkers';
+      clearBgImage();
+    }
+  }
+
+  function applyBgImage() {
+    if (!lastImageURL) return;
+    // Image on html (full viewport)
+    var html = document.documentElement;
+    html.style.backgroundImage = 'url(' + lastImageURL + ')';
+    html.style.backgroundSize = 'cover';
+    html.style.backgroundPosition = 'center top';
+    html.style.backgroundRepeat = 'no-repeat';
+    // Make body transparent so html image shows through
+    document.body.style.backgroundColor = 'transparent';
+    document.body.style.backgroundImage = 'none';
+  }
+
+  function clearBgImage() {
+    var html = document.documentElement;
+    html.style.backgroundImage = '';
+    html.style.backgroundSize = '';
+    html.style.backgroundPosition = '';
+    html.style.backgroundRepeat = '';
+    // Restore body checkerboard (CSS takes over)
+    document.body.style.backgroundColor = '';
+    document.body.style.backgroundImage = '';
+  }
+
+  // ========== SHARED: Apply layers ==========
+  function applyLayers(imageURL) {
+    lastImageURL = imageURL;
+    placeholder.classList.add('hidden');
+    extractAndApplyColors(imageURL);
+    if (bgMode === 'image') applyBgImage();
+    fileInput.value = '';
+  }
+})();

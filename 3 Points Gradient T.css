@@ -1,0 +1,240 @@
+/* ========== RESET & BASE ========== */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 960px;
+  margin: 0 auto;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  overflow-x: hidden;
+  color: #fff;
+  /* Checkerboard pattern to demonstrate transparency */
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, #ccc 25%, transparent 25%),
+    linear-gradient(-45deg, #ccc 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #ccc 75%),
+    linear-gradient(-45deg, transparent 75%, #ccc 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ========== RESULT SECTION (960×540 landscape) ========== */
+.result-section {
+  position: relative;
+  width: 960px;
+  height: 540px;
+  background: #1b1c21;
+  overflow: hidden;
+
+  /* Top-transparency mask from Figma (node 20404:44887) */
+  /* Fades from ~90% visible at top to 100% visible at 50% height */
+  -webkit-mask-image: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, white 50%);
+  mask-image: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, white 50%);
+}
+
+/* Layer 2: 3-color diagonal gradient from Vibrant.js */
+.color-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: #1b1c21;
+  transition: background 0.6s ease;
+}
+
+/* Layer 3: Dimmer overlay — 20% opacity per Figma spec */
+.dimmer-layer {
+  position: absolute;
+  inset: 0;
+  background: #141414;
+  opacity: 0.2;
+  z-index: 2;
+}
+
+/* Placeholder text before upload */
+.placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+.placeholder-text {
+  color: #555;
+  font-size: 16px;
+}
+
+.placeholder.hidden {
+  display: none !important;
+}
+
+/* Background toggle button */
+.bg-toggle {
+  align-self: flex-end;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid #333;
+  border-radius: 8px;
+  background: #1a1a1a;
+  color: #888;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.bg-toggle:active {
+  opacity: 0.7;
+}
+
+/* ========== CONTROLS SECTION (below result) ========== */
+.controls-section {
+  width: 960px;
+  padding: 24px 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  background: #111;
+}
+
+/* Search bar */
+.search-wrapper {
+  display: flex;
+  width: 100%;
+  gap: 8px;
+}
+
+.search-input {
+  flex: 1;
+  height: 48px;
+  padding: 0 16px;
+  border: 1px solid #333;
+  border-radius: 12px;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 14px;
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: #555;
+}
+
+.search-input::placeholder {
+  color: #666;
+}
+
+.search-btn {
+  height: 48px;
+  padding: 0 20px;
+  border: none;
+  border-radius: 12px;
+  background: #fff;
+  color: #000;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.search-btn:active {
+  opacity: 0.7;
+}
+
+/* Search results grid — 5 columns, 16:9 landscape cards */
+.search-results {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.search-results:empty {
+  display: none;
+}
+
+.result-card {
+  width: calc(20% - 7px);
+  aspect-ratio: 16/9;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  position: relative;
+  border: 2px solid transparent;
+  transition: border-color 0.2s;
+}
+
+.result-card:hover {
+  border-color: rgba(255,255,255,0.3);
+}
+
+.result-card:active {
+  border-color: #fff;
+}
+
+.result-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.result-card .card-title {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 4px 6px;
+  background: rgba(0,0,0,0.7);
+  font-size: 11px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Divider */
+.divider {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #555;
+  font-size: 12px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #333;
+}
+
+/* Upload button */
+.upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 48px;
+  border-radius: 12px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  color: #aaa;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.upload-btn:active {
+  opacity: 0.7;
+}
